@@ -1,7 +1,5 @@
 # simple-redis-in-py
 
-# Simple Redis-like TCP Server
-
 ## Requirements
 
 - Python 3.x
