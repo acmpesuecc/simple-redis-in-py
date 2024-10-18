@@ -18,14 +18,12 @@ class Client:
         if items is not None:
             request['items'] = items
 
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-                client_socket.connect((self.host, self.port))
-                client_socket.send(json.dumps(request).encode('utf-8'))
-                response = client_socket.recv(1024).decode('utf-8')
-                return json.loads(response)
-        except ConnectionRefusedError:
-            return "Could not connect to the server"
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            client_socket.connect((self.host, self.port))
+            client_socket.send(json.dumps(request).encode('utf-8'))
+            response = client_socket.recv(1024).decode('utf-8')
+            return json.loads(response)
+
 
     def run(self):
         print("Currently in client - enter 'bye' to quit:")
