@@ -26,7 +26,7 @@ class Client:
     def run(self):
         print("currently in client - enter 'bye' to quit:c")
         while True:
-            command = input("\nenter command (example - SET key value, GET key, DELETE key, FLUSH, MSET key1=value1,key2=value2, MGET key1,key2): ")
+            command = input("\nenter command (example - SET key value, GET key, DELETE key, FLUSH, MSET key1=value1,key2=value2, MGET key1,key2, MDELETE key1,key2): ")
             if command.lower()== 'bye':
                 break
 

@@ -20,7 +20,7 @@ class Server:
         if key in self.store:
             del self.store[key]
             return f'deleted {key}'
-        return f'key {key} does not exist'
+        return None
 
     def flush(self):
         self.store.clear()
@@ -35,12 +35,19 @@ class Server:
         return 'stored multiple values :O'
 
     def mdelete(self, keys):
-        non_existent_keys = [key for key in keys if key not in self.store]
-        if non_existent_keys:
-            return f'keys {non_existent_keys} do not exist'
+        if keys is None:
+            return "no keys to delete"
+        deleted_keys = []
+        non_existent_keys = []
         for key in keys:
-            del self.store[key]
-        return f'deleted keys {keys}'
+            if key in self.store:
+                del self.store[key]
+                deleted_keys.append(key)
+            else:
+                non_existent_keys.append(key)
+
+        return {'deleted_keys': deleted_keys, 'non_existent_keys': non_existent_keys}
+
 
 #here we have to manage said methods w a client socket in a server
     def handle_client(self, client_socket):
@@ -63,6 +70,7 @@ class Server:
         elif command['action'] == 'MDELETE':
             response = self.mdelete(command['keys'])
         else:
+            print(command['action'])
             response = 'unknown command pls try again'
 
         client_socket.send(json.dumps(response).encode('utf-8'))
