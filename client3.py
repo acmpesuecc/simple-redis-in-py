@@ -7,7 +7,7 @@ class Client:
         self.port= port
 
     def send_request(self,action, key=None, value=None, keys=None, items=None):
-        request = {'action': action} 
+        request = {'action': action}
         if key is not None:
             request['key'] = key
         if value is not None:
@@ -29,7 +29,7 @@ class Client:
             command = input("\nenter command (example - SET key value, GET key, DELETE key, FLUSH, MSET key1=value1,key2=value2, MGET key1,key2): ")
             if command.lower()== 'bye':
                 break
-            
+
             parts = command.split()
             action= parts[0].upper()
 
@@ -49,6 +49,9 @@ class Client:
                 items = dict(item.split('=') for item in parts[1].split(','))
                 response = self.send_request(action,items=items)
             elif action == 'MGET':
+                keys = parts[1].split(',')
+                response = self.send_request(action,keys=keys)
+            elif action == "MDELETE":
                 keys = parts[1].split(',')
                 response = self.send_request(action,keys=keys)
             else:
