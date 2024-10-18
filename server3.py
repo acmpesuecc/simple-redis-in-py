@@ -9,8 +9,8 @@ class Server:
         self.port= port
 
 # adding your methods and responses for clarity
-    def set(self,key,value): 
-        self.store[key] = value 
+    def set(self,key,value):
+        self.store[key] = value
         return f'stored {key}'
 
     def get(self,key):
@@ -20,24 +20,32 @@ class Server:
         if key in self.store:
             del self.store[key]
             return f'deleted {key}'
-        return None
+        return f'key {key} does not exist'
 
     def flush(self):
         self.store.clear()
         return 'cleared all data ruh roh'
 
     def mget(self, keys):
-        return {key: self.store.get(key) for key in keys} 
+        return {key: self.store.get(key) for key in keys}
 
     def mset(self,items):
         for key, value in items.items():
             self.store[key] = value
         return 'stored multiple values :O'
 
+    def mdelete(self, keys):
+        non_existent_keys = [key for key in keys if key not in self.store]
+        if non_existent_keys:
+            return f'keys {non_existent_keys} do not exist'
+        for key in keys:
+            del self.store[key]
+        return f'deleted keys {keys}'
+
 #here we have to manage said methods w a client socket in a server
     def handle_client(self, client_socket):
         request = client_socket.recv(1024).decode('utf-8') #decode to conv to string format(json) + serialization
-        command = json.loads(request) 
+        command = json.loads(request)
         #this takes a JSON-encoded string as i/p and parses it into a py obj (dict) , request has the raw data from socket AS a utf-8 encoded string, and command becomes our py dict
 
         if command['action'] == 'SET':
@@ -52,6 +60,8 @@ class Server:
             response = self.mget(command['keys'])
         elif command['action'] == 'MSET':
             response = self.mset(command['items'])
+        elif command['action'] == 'MDELETE':
+            response = self.mdelete(command['keys'])
         else:
             response = 'unknown command pls try again'
 
@@ -59,7 +69,7 @@ class Server:
         client_socket.close()
 
     def run(self):
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #socket obj, AF_INET - IPv4 protocol, sock_stream -  TCP protocol 
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #socket obj, AF_INET - IPv4 protocol, sock_stream -  TCP protocol
         server_socket.bind((self.host, self.port)) #binds the socket to host and port to listen to incoming connections
         server_socket.listen(5)
         print(f'YAHOO server is running on {self.host}:{self.port}')
