@@ -40,19 +40,21 @@ class Client:
                 if len(parts) < 3:
                     print("Error: SET requires at least key and value")
             
-
+                expiry = None
                 key= parts[1]
                 value = parts[2]
 
-                if len(parts) > 3 and parts[3].upper() == 'EX':
-                    if len(parts) != 5:
-                        print("Error: EX requires seconds parameter")
-                        continue
-                    try:
-                        expiry = int(parts[4])
-                    except ValueError:
-                        print("Error: EX seconds must be an integer")
-                        continue
+                if len(parts) > 3:
+                    if parts[3].upper() == 'EX':
+                        if len(parts) != 5:
+                            print("Error: EX requires seconds parameter")
+                            continue
+                        try:
+                            expiry = int(parts[4])
+                        except ValueError:
+                            print("Error: EX seconds must be an integer")
+                            continue
+                    else: print("Please enter EX to implement expiry")
 
                 response = self.send_request(action,key=key, value=value, expiry=expiry)
 
