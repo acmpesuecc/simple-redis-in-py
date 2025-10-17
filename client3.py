@@ -6,7 +6,7 @@ class Client:
         self.host= host
         self.port= port
 
-    def send_request(self,action, key=None, value=None, keys=None, items=None):
+    def send_request(self,action, key=None, value=None, keys=None, items=None, expiry = None):
         request = {'action': action} 
         if key is not None:
             request['key'] = key
@@ -16,6 +16,8 @@ class Client:
             request['keys'] = keys
         if items is not None:
             request['items']= items
+        if expiry is not None:
+            request['expiry'] = expiry
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             client_socket.connect((self.host, self.port))
@@ -34,9 +36,27 @@ class Client:
             action= parts[0].upper()
 
             if action == 'SET':
+
+                if len(parts) < 3:
+                    print("Error: SET requires at least key and value")
+            
+
                 key= parts[1]
                 value = parts[2]
-                response = self.send_request(action,key=key, value=value)
+
+                if len(parts) > 3 and parts[3].upper() == 'EX':
+                    if len(parts) != 5:
+                        print("Error: EX requires seconds parameter")
+                        continue
+                    try:
+                        expiry = int(parts[4])
+                    except ValueError:
+                        print("Error: EX seconds must be an integer")
+                        continue
+
+                response = self.send_request(action,key=key, value=value, expiry=expiry)
+
+                
             elif action == 'GET':
                 key = parts[1]
                 response = self.send_request(action,key=key)
